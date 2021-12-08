@@ -1,12 +1,26 @@
+import M from "minimatch";
+import { useRecoilState } from "recoil";
+import { async } from "regenerator-runtime";
+import { currentTrackState, isPlayingState } from "../atoms/songAtom";
 import useSpotify from "../hooks/useSpotify";
 import { millisToMinutesAndSeconds } from "../lib/time";
 
 function Song({ order, track }) {
   const spotifyApi = useSpotify();
+  const [currentTrackId, setCurrentTrackId] = useRecoilState(currentTrackState);
+  const [isPlaying, setIsPlaying] = useRecoilState(isPlayingState);
+
+  const playSong = () => {
+    setCurrentTrackId(track.track.id),
+    setIsPlaying(true);
+    spotifyApi.play({
+      uris: [track.track.uri],
+    })
+  }
 
   return (
     <div className="grid grid-cols-2 text-gray-500 py-4 px-5 hover:bg-gray-900 rounded-lg">
-      <div className="flex items-center space-x-4 cursor-crosshair">
+      <div className="flex items-center space-x-4 cursor-crosshair" onClick={playSong}>
         <p>{order + 1}</p>
         <img
           className="h-10 w-10"

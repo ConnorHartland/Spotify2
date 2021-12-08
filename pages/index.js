@@ -2,6 +2,7 @@ import Head from "next/head";
 import Sidebar from "../components/Sidebar";
 import Center from "../components/Center";
 import { getSession } from "next-auth/react";
+import Player from "../components/Player";
 
 // NEXTAUTH_URL | NEXT_PUBLIC_CLIENT_SECRET | NEXT_PUBLIC_CLIENT_ID | JWT_SECRET
 
@@ -13,7 +14,7 @@ export default function Home() {
         <Center />
       </main>
 
-      <div>{/* Player */}</div>
+      <div className="sticky bottom-0"><Player /></div>
     </div>
   );
 }
