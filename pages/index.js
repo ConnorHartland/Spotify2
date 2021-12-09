@@ -1,30 +1,30 @@
-import Head from "next/head";
-import Sidebar from "../components/Sidebar";
+import { getSession, useSession } from "next-auth/react";
 import Center from "../components/Center";
-import { getSession } from "next-auth/react";
 import Player from "../components/Player";
-
-// NEXTAUTH_URL | NEXT_PUBLIC_CLIENT_SECRET | NEXT_PUBLIC_CLIENT_ID | JWT_SECRET
+import Sidebar from "../components/Sidebar";
 
 export default function Home() {
+  const { data: session, status } = useSession();
+
+  console.log("CLIENT SESSION IS >>> ", session);
+
   return (
     <div className="bg-black h-screen overflow-hidden">
-      <main className="flex">
+      <main className="overflow-hidden scrollbar-hide flex">
         <Sidebar />
         <Center />
       </main>
 
-      <div className="sticky bottom-0"><Player /></div>
+      <div className="sticky bottom-0">
+        <Player />
+      </div>
     </div>
   );
 }
 
 export async function getServerSideProps(context) {
   const session = await getSession(context);
-
   return {
-    props: {
-      session,
-    },
+    props: { session },
   };
 }
