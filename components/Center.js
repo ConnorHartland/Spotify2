@@ -1,11 +1,12 @@
 import { ChevronDownIcon } from "@heroicons/react/outline";
-import { signOut, useSession } from "next-auth/react";
 import { shuffle } from "lodash";
-import { useState, useEffect } from "react";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { signOut, useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { useRecoilState } from "recoil";
 import { playlistIdState, playlistState } from "../atoms/playlistAtom";
 import useSpotify from "../hooks/useSpotify";
 import Songs from "./Songs";
+
 const colors = [
   "from-indigo-500",
   "from-blue-500",
@@ -19,28 +20,33 @@ const colors = [
 function Center() {
   const { data: session } = useSession();
   const spotifyApi = useSpotify();
-  const [color, setColor] = useState([]);
-  const playlistId = useRecoilValue(playlistIdState);
+  const [playlistId, setPlaylistId] = useRecoilState(playlistIdState);
   const [playlist, setPlaylist] = useRecoilState(playlistState);
-
+  const [color, setColor] = useState(null);
 
   useEffect(() => {
     setColor(shuffle(colors).pop());
-  }, [playlistId]);
+  }, [playlist]);
 
   useEffect(() => {
-    spotifyApi
-      .getPlaylist(playlistId)
-      .then((data) => {
+    spotifyApi.getPlaylist(playlistId).then(
+      function (data) {
+        console.log("Some information about this playlist", data.body);
         setPlaylist(data.body);
-      })
-      .catch((error) => console.log("Something went wrong!", error));
+      },
+      function (err) {
+        console.log("Something went wrong!", err);
+      }
+    );
   }, [spotifyApi, playlistId]);
 
   return (
-    <div className="flex-grow h-screen overflow-y-scroll scrollbar-hide">
+    <div className="bg-black flex-grow col-span-full relative h-screen overflow-y-scroll scrollbar-hide">
       <header className="absolute top-5 right-8">
-        <div className="flex items-center bg-black space-x-3 opacity-90 hover:opacity-80 cursor-pointer rounded-full p-1 pr-2 text-white" onClick={() => signOut()}>
+        <div
+          onClick={signOut}
+          className="flex items-center bg-black space-x-3 text-white opacity-90 rounded-full p-1 pr-2 hover:opacity-80 cursor-pointer"
+        >
           <img
             className="rounded-full w-10 h-10"
             src={session?.user.image}
@@ -52,13 +58,12 @@ function Center() {
       </header>
 
       <section
-        className={`flex items-end space-x-7 bg-gradient-to-b to-black ${color} h-80 text-white p-8`}
+        className={`flex items-end space-x-7 bg-gradient-to-b ${color} from to-black h-80 text-white p-8`}
       >
         <img
-          className="h-44 w-44 drop-shadow-2xl"
           src={playlist?.images?.[0]?.url}
-          alt=""
-        ></img>
+          className="h-44 w-44 shadow-2xl"
+        />
         <div>
           <p>PLAYLIST</p>
           <h1 className="text-2xl md:text-3xl xl:text-5xl font-bold">
@@ -67,7 +72,7 @@ function Center() {
         </div>
       </section>
 
-      <div>
+      <div className="">
         <Songs />
       </div>
     </div>
